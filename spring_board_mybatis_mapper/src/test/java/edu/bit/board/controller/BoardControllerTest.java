@@ -22,5 +22,5 @@ public class BoardControllerTest {
 	public void listTest() throws Exception{
 		
 	}
-
+//
 }
