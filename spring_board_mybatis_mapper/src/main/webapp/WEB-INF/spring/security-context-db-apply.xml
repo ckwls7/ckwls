@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+    
+    <!-- 검사 URL -->
+    <http auto-config="true" use-expressions="true" > 
+        <intercept-url pattern="/login/loginForm" access="permitAll" />
+        <intercept-url pattern="/" access="permitAll" />
+        <intercept-url pattern="/board/**" access="hasRole('ADMIN')" />
+        <intercept-url pattern="/admin/**" access="hasRole('ADMIN')" />
+        <intercept-url pattern="/**" access="hasAnyRole('USER, ADMIN')" />
+        <csrf disabled="true"/>
+        <form-login login-page="/login/loginForm"
+                    default-target-url="/"
+                    authentication-failure-url="/login/loginForm?error"
+                    username-parameter="id"
+                    password-parameter="password" />
+        
+         <logout logout-url="/logout"
+                logout-success-url="/" /> 
+                
+        <access-denied-handler error-page="/login/accessDenied" />
+    </http>    
+    
+    <!--
+    	JDBC를 이용한 인증/권한 처리
+    	JDBC를 이용하여 인증/권한 방식은 크게 두가지임
+    	1)지정된 형식으로 테이블 생성 방법
+    	2)기존에 작성된 데이터 베이스 연동방법  
+    	
+    	
+    	
+    -->
+    <!-- JDBC -->
+     <beans:bean id="userDetailsService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
+        <beans:property name="dataSource" ref="dataSource"/>
+    </beans:bean> 
+   <!--
+   		2.기존 작성된 데이터 베이스 연동하는 방식 
+   		users-by-username-query를 통해 ID에 따른 비번 일치 여부를 확인
+   		authorities-by-username-query에서 로그인에 성공한 사용자의 권한을 확인
+   		 
+   		 위의 두 쿼리를 활용하는 형태임
+   		 예)scott 의 기본적인 emp테이블을 활용한 예
+   		 select ename,case when job='MANAGER' then 'ROLE_ADMIN' else  'ROLE_USER' end authority from emp where ename=?
+   		 case when으로 잡이 매니저면 role_admin을불러주고 아니면role_user를 불러준다
+    -->
+	
+    <!--  provider  -->
+      <authentication-manager>
+        <authentication-provider>
+        <jdbc-user-service 
+            data-source-ref="dataSource"
+            role-prefix=""
+            users-by-username-query="select ename,empno, 1 from emp where ename = ?"
+            authorities-by-username-query="select ename,case when job='MANAGER' then 'ROLE_ADMIN' else  'ROLE_USER' end authority from emp where ename=?" 
+        />
+        </authentication-provider>
+    </authentication-manager> 
+</beans:beans>
+
+	
+	
+	
+

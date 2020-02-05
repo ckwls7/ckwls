@@ -23,6 +23,17 @@
 	
 	<context:component-scan base-package="edu.bit.board" />
 	
+	<beans:bean id="boardInterceptor" class="edu.bit.board.interceptor.BoardInterceptor">
+		
+	</beans:bean>
+	<!--interceptor설정  -->
+	<interceptors>
+		<interceptor>
+			<mapping path="/board/**"/><!-- 중간에 보드로오는 모든것들을 낚아챔 -->
+			<exclude-mapping path="/resources/**"/>
+			<beans:ref bean="boardInterceptor"/>
+		</interceptor>
+	</interceptors>
 	
 	
 </beans:beans>

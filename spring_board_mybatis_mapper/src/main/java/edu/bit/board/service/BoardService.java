@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edu.bit.board.mapper.BoardMapper;
+import edu.bit.board.page.Criteria;
 import edu.bit.board.vo.BoardVO;
 
 @Service
@@ -48,6 +49,17 @@ public class BoardService {//비지니스 로직이 들어가야함
 		boardMapper.Delete(boardVO);
 		
 	}
+
+	public int selectCountBoard() {
+		
+		return boardMapper.selectCountBoard();
+	}
 	
+	public List<BoardVO> selectBoardListPage(Criteria criteria){
+		return boardMapper.selectBoardListPage(criteria);
+	}
+
+
+
 
 }
